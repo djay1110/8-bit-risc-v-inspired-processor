@@ -1,0 +1,29 @@
+# Icarus Verilog / simulator outputs
+*.vvp
+*.out
+*.vcd
+*.fst
+*.wlf
+transcript
+*.jou
+
+# Questa / ModelSim work products
+work/
+vsim.wlf
+
+# Temporary logs; selected evidence may be kept under simulation/results/
+*.log
+!simulation/results/
+!simulation/results/**/*.log
+
+# FPGA tool build products
+db/
+incremental_db/
+output_files/
+obj_dir/
+
+# Editor and temporary files
+.vscode/
+*.tmp
+*.bak
+*~
