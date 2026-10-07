@@ -26,7 +26,7 @@ An educational custom 8-bit processor inspired by RISC-V concepts. It is **not s
 | Data Memory | 256 × 8-bit array, combinational read, synchronous write, no reset | [data_memory.v](rtl/data_memory.v) | [data_memory_tb.v](testbench/data_memory_tb.v) | **Verified** |
 | Control Unit | Maps opcode/funct3 to ALU, writeback, memory, and PC controls; suppresses illegal side effects | [control_unit.v](rtl/control_unit.v) | [control_unit_tb.v](testbench/control_unit_tb.v) | **Verified** |
 | Datapath | Integrates decoder, control, register file, immediate generator, ALU, writeback, and PC logic; memories connect through ports | [datapath.v](rtl/datapath.v) | [datapath_tb.v](testbench/datapath_tb.v) | **Verified** |
-| CPU Top | Connects datapath with instruction and data memories | Not started | Not started | Not Started |
+| CPU Top | Connects instruction ROM, datapath, and data RAM; exposes illegal-instruction status | [cpu.v](rtl/cpu.v) | [cpu_top_tb.v](testbench/cpu_top_tb.v) | **Verified** |
 
 ## Testbenches
 
@@ -41,6 +41,7 @@ An educational custom 8-bit processor inspired by RISC-V concepts. It is **not s
 | [data_memory_tb.v](testbench/data_memory_tb.v) | [data_memory.v](rtl/data_memory.v) | **Verified** |
 | [control_unit_tb.v](testbench/control_unit_tb.v) | [control_unit.v](rtl/control_unit.v) | **Verified** |
 | [datapath_tb.v](testbench/datapath_tb.v) | [datapath.v](rtl/datapath.v), with [data_memory.v](rtl/data_memory.v) | **Verified** |
+| [cpu_top_tb.v](testbench/cpu_top_tb.v) | [cpu.v](rtl/cpu.v) and integrated memories | **Verified** |
 
 Run the register-file simulation from the project root in a PowerShell terminal:
 
@@ -123,6 +124,15 @@ vvp .\datapath_tb.out
 
 Expected final message: `DATAPATH TEST PASSED: 45 checks`.
 
+Run the CPU-top simulation from the project root:
+
+```powershell
+iverilog -g2005 -Wall -s cpu_top_tb -o cpu_top_tb.out rtl/cpu.v rtl/instruction_memory.v rtl/datapath.v rtl/instruction_decoder.v rtl/control_unit.v rtl/register_file.v rtl/immediate_generator.v rtl/alu.v rtl/program_counter.v rtl/data_memory.v testbench/cpu_top_tb.v
+vvp .\cpu_top_tb.out
+```
+
+Expected final message: `CPU TOP TEST PASSED: 18 checks`.
+
 ## Verification status
 
 | Module | Simulation result | Evidence |
@@ -136,6 +146,7 @@ Expected final message: `DATAPATH TEST PASSED: 45 checks`.
 | Data Memory | **PASS** — all 12 write-timing, combinational-read, address, and persistence checks passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/data_memory_tb.v), [RTL](rtl/data_memory.v) |
 | Control Unit | **PASS** — all 15 instruction/control and illegal-suppression cases passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/control_unit_tb.v), [RTL](rtl/control_unit.v) |
 | Datapath | **PASS** — all 45 integration checks passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/datapath_tb.v), [RTL](rtl/datapath.v) |
+| CPU Top | **PASS** — all 18 top-level integration checks passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/cpu_top_tb.v), [RTL](rtl/cpu.v), [ROM image](programs/cpu_top_test.mem) |
 | Other modules | Not started | — |
 
 ## Demonstration programs
@@ -159,6 +170,7 @@ rtl/instruction_memory.v
 rtl/data_memory.v
 rtl/control_unit.v
 rtl/datapath.v
+rtl/cpu.v
 testbench/register_file_tb.v
 testbench/alu_tb.v
 testbench/immediate_generator_tb.v
@@ -168,6 +180,8 @@ testbench/instruction_memory_tb.v
 testbench/data_memory_tb.v
 testbench/control_unit_tb.v
 testbench/datapath_tb.v
+testbench/cpu_top_tb.v
+programs/cpu_top_test.mem
 docs/Architecture_Specification_v1.0.md
 .gitignore
 ```
