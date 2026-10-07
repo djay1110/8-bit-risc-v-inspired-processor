@@ -18,7 +18,7 @@ An educational custom 8-bit processor inspired by RISC-V concepts. It is **not s
 | Module | Description | RTL | Testbench | Status |
 |---|---|---|---|---|
 | Register File | 8 × 8-bit registers, two combinational read ports, one synchronous write port, hardwired-zero `x0` | [register_file.v](rtl/register_file.v) | [register_file_tb.v](testbench/register_file_tb.v) | **Verified** |
-| ALU | 8-bit arithmetic and logic unit | Not started | Not started | Not Started |
+| ALU | 8-bit arithmetic and logic unit | [alu.v](rtl/alu.v) | [alu_tb.v](testbench/alu_tb.v) | **Verified** |
 | Immediate Generator | Extracts and extends instruction immediates | Not started | Not started | Not Started |
 | Instruction Decoder | Decodes instruction fields | Not started | Not started | Not Started |
 | Program Counter / Next-PC Logic | PC state and sequential/branch/jump selection | Not started | Not started | Not Started |
@@ -32,6 +32,7 @@ An educational custom 8-bit processor inspired by RISC-V concepts. It is **not s
 | Testbench | Module under test | Status |
 |---|---|---|
 | [register_file_tb.v](testbench/register_file_tb.v) | [register_file.v](rtl/register_file.v) | **Verified** |
+| [alu_tb.v](testbench/alu_tb.v) | [alu.v](rtl/alu.v) | **Verified** |
 
 Run the register-file simulation from the project root in a PowerShell terminal:
 
@@ -42,11 +43,21 @@ vvp .\register_file_tb.out
 
 Expected final message: `REGISTER FILE TEST PASSED`.
 
+Run the ALU simulation from the project root:
+
+```powershell
+iverilog -g2005 -Wall -s alu_tb -o alu_tb.out rtl/alu.v testbench/alu_tb.v
+vvp .\alu_tb.out
+```
+
+Expected final message: `ALU TEST PASSED`.
+
 ## Verification status
 
 | Module | Simulation result | Evidence |
 |---|---|---|
 | Register File | **PASS** — all testbench checks passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/register_file_tb.v), [RTL](rtl/register_file.v) |
+| ALU | **PASS** — all 13 test cases passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/alu_tb.v), [RTL](rtl/alu.v) |
 | Other modules | Not started | — |
 
 ## Demonstration programs
@@ -62,7 +73,9 @@ The approved architecture document contains the arithmetic/memory and loop assem
 ```text
 README.md
 rtl/register_file.v
+rtl/alu.v
 testbench/register_file_tb.v
+testbench/alu_tb.v
 docs/Architecture_Specification_v1.0.md
 .gitignore
 ```
