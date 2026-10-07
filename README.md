@@ -22,7 +22,7 @@ An educational custom 8-bit processor inspired by RISC-V concepts. It is **not s
 | Immediate Generator | Sign-extends the shared 6-bit immediate/branch offset and exposes the signed 9-bit JAL offset | [immediate_generator.v](rtl/immediate_generator.v) | [immediate_generator_tb.v](testbench/immediate_generator_tb.v) | **Verified** |
 | Instruction Decoder | Extracts opcode/register fields and flags reserved encodings | [instruction_decoder.v](rtl/instruction_decoder.v) | [instruction_decoder_tb.v](testbench/instruction_decoder_tb.v) | **Verified** |
 | Program Counter / Next-PC Logic | Synchronous PC register plus 10-bit signed target arithmetic and PC selection | [program_counter.v](rtl/program_counter.v) | [program_counter_tb.v](testbench/program_counter_tb.v) | **Verified** |
-| Instruction Memory | 256 × 16-bit instruction words | Not started | Not started | Not Started |
+| Instruction Memory | 256 × 16-bit ROM, combinational read, `.mem` initialization | [instruction_memory.v](rtl/instruction_memory.v) | [instruction_memory_tb.v](testbench/instruction_memory_tb.v) | **Verified** |
 | Data Memory | 256 × 8-bit data bytes | Not started | Not started | Not Started |
 | Control Unit | Generates architectural control signals | Not started | Not started | Not Started |
 | Datapath / CPU | Integration stages | Not started | Not started | Not Started |
@@ -36,6 +36,7 @@ An educational custom 8-bit processor inspired by RISC-V concepts. It is **not s
 | [immediate_generator_tb.v](testbench/immediate_generator_tb.v) | [immediate_generator.v](rtl/immediate_generator.v) | **Verified** |
 | [instruction_decoder_tb.v](testbench/instruction_decoder_tb.v) | [instruction_decoder.v](rtl/instruction_decoder.v) | **Verified** |
 | [program_counter_tb.v](testbench/program_counter_tb.v) | [program_counter.v](rtl/program_counter.v) | **Verified** |
+| [instruction_memory_tb.v](testbench/instruction_memory_tb.v) | [instruction_memory.v](rtl/instruction_memory.v) | **Verified** |
 
 Run the register-file simulation from the project root in a PowerShell terminal:
 
@@ -82,6 +83,15 @@ vvp .\program_counter_tb.out
 
 Expected final message: `PROGRAM COUNTER TEST PASSED`.
 
+Run the instruction-memory simulation from the project root:
+
+```powershell
+iverilog -g2005 -Wall -s instruction_memory_tb -o instruction_memory_tb.out rtl/instruction_memory.v testbench/instruction_memory_tb.v
+vvp .\instruction_memory_tb.out
+```
+
+Expected final message: `INSTRUCTION MEMORY TEST PASSED`.
+
 ## Verification status
 
 | Module | Simulation result | Evidence |
@@ -91,11 +101,12 @@ Expected final message: `PROGRAM COUNTER TEST PASSED`.
 | Immediate Generator | **PASS** — all 7 field extraction/sign-extension cases passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/immediate_generator_tb.v), [RTL](rtl/immediate_generator.v) |
 | Instruction Decoder | **PASS** — all 23 field/validity cases passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/instruction_decoder_tb.v), [RTL](rtl/instruction_decoder.v) |
 | Program Counter / Next-PC Logic | **PASS** — all 14 sequential and combinational PC checks passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/program_counter_tb.v), [RTL](rtl/program_counter.v) |
+| Instruction Memory | **PASS** — all 5 combinational ROM reads passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/instruction_memory_tb.v), [RTL](rtl/instruction_memory.v), [test image](programs/instruction_memory_test.mem) |
 | Other modules | Not started | — |
 
 ## Demonstration programs
 
-The approved architecture document contains the arithmetic/memory and loop assembly examples. Program image files under `programs/` will be added in the demonstration-program phase.
+The approved architecture document contains the arithmetic/memory and loop assembly examples. [instruction_memory_test.mem](programs/instruction_memory_test.mem) is a unit-test ROM image; demonstration program images will be added in the demonstration-program phase.
 
 ## FPGA implementation
 
@@ -110,11 +121,13 @@ rtl/alu.v
 rtl/immediate_generator.v
 rtl/instruction_decoder.v
 rtl/program_counter.v
+rtl/instruction_memory.v
 testbench/register_file_tb.v
 testbench/alu_tb.v
 testbench/immediate_generator_tb.v
 testbench/instruction_decoder_tb.v
 testbench/program_counter_tb.v
+testbench/instruction_memory_tb.v
 docs/Architecture_Specification_v1.0.md
 .gitignore
 ```
