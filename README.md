@@ -24,7 +24,7 @@ An educational custom 8-bit processor inspired by RISC-V concepts. It is **not s
 | Program Counter / Next-PC Logic | Synchronous PC register plus 10-bit signed target arithmetic and PC selection | [program_counter.v](rtl/program_counter.v) | [program_counter_tb.v](testbench/program_counter_tb.v) | **Verified** |
 | Instruction Memory | 256 × 16-bit ROM, combinational read, `.mem` initialization | [instruction_memory.v](rtl/instruction_memory.v) | [instruction_memory_tb.v](testbench/instruction_memory_tb.v) | **Verified** |
 | Data Memory | 256 × 8-bit array, combinational read, synchronous write, no reset | [data_memory.v](rtl/data_memory.v) | [data_memory_tb.v](testbench/data_memory_tb.v) | **Verified** |
-| Control Unit | Generates architectural control signals | Not started | Not started | Not Started |
+| Control Unit | Maps opcode/funct3 to ALU, writeback, memory, and PC controls; suppresses illegal side effects | [control_unit.v](rtl/control_unit.v) | [control_unit_tb.v](testbench/control_unit_tb.v) | **Verified** |
 | Datapath / CPU | Integration stages | Not started | Not started | Not Started |
 
 ## Testbenches
@@ -38,6 +38,7 @@ An educational custom 8-bit processor inspired by RISC-V concepts. It is **not s
 | [program_counter_tb.v](testbench/program_counter_tb.v) | [program_counter.v](rtl/program_counter.v) | **Verified** |
 | [instruction_memory_tb.v](testbench/instruction_memory_tb.v) | [instruction_memory.v](rtl/instruction_memory.v) | **Verified** |
 | [data_memory_tb.v](testbench/data_memory_tb.v) | [data_memory.v](rtl/data_memory.v) | **Verified** |
+| [control_unit_tb.v](testbench/control_unit_tb.v) | [control_unit.v](rtl/control_unit.v) | **Verified** |
 
 Run the register-file simulation from the project root in a PowerShell terminal:
 
@@ -102,6 +103,15 @@ vvp .\data_memory_tb.out
 
 Expected final message: `DATA MEMORY TEST PASSED`.
 
+Run the control-unit simulation from the project root:
+
+```powershell
+iverilog -g2005 -Wall -s control_unit_tb -o control_unit_tb.out rtl/control_unit.v testbench/control_unit_tb.v
+vvp .\control_unit_tb.out
+```
+
+Expected final message: `CONTROL UNIT TEST PASSED`.
+
 ## Verification status
 
 | Module | Simulation result | Evidence |
@@ -113,6 +123,7 @@ Expected final message: `DATA MEMORY TEST PASSED`.
 | Program Counter / Next-PC Logic | **PASS** — all 14 sequential and combinational PC checks passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/program_counter_tb.v), [RTL](rtl/program_counter.v) |
 | Instruction Memory | **PASS** — all 5 combinational ROM reads passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/instruction_memory_tb.v), [RTL](rtl/instruction_memory.v), [test image](programs/instruction_memory_test.mem) |
 | Data Memory | **PASS** — all 12 write-timing, combinational-read, address, and persistence checks passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/data_memory_tb.v), [RTL](rtl/data_memory.v) |
+| Control Unit | **PASS** — all 15 instruction/control and illegal-suppression cases passed with Icarus Verilog; no compiler warnings or errors | [testbench](testbench/control_unit_tb.v), [RTL](rtl/control_unit.v) |
 | Other modules | Not started | — |
 
 ## Demonstration programs
@@ -134,6 +145,7 @@ rtl/instruction_decoder.v
 rtl/program_counter.v
 rtl/instruction_memory.v
 rtl/data_memory.v
+rtl/control_unit.v
 testbench/register_file_tb.v
 testbench/alu_tb.v
 testbench/immediate_generator_tb.v
@@ -141,6 +153,7 @@ testbench/instruction_decoder_tb.v
 testbench/program_counter_tb.v
 testbench/instruction_memory_tb.v
 testbench/data_memory_tb.v
+testbench/control_unit_tb.v
 docs/Architecture_Specification_v1.0.md
 .gitignore
 ```
