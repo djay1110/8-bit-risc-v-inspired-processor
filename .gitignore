@@ -4,6 +4,7 @@
 *.vcd
 *.fst
 *.wlf
+*_tb_sim.exe
 transcript
 *.jou
 
@@ -17,6 +18,13 @@ vsim.wlf
 !simulation/results/**/*.log
 
 # FPGA tool build products
+*.runs/
+*.cache/
+*.hw/
+*.bit
+*.dcp
+*.pb
+*.rpx
 db/
 incremental_db/
 output_files/
