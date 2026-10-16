@@ -11,7 +11,8 @@ module register_file (
     input  [2:0] rd,
     input  [7:0] wd,
     output [7:0] rd1,
-    output [7:0] rd2
+    output [7:0] rd2,
+    output [7:0] debug_x3
 );
 
     reg [7:0] registers [1:7];
@@ -34,5 +35,6 @@ module register_file (
     // Asynchronous read ports. Reads of x0 always return zero.
     assign rd1 = (rs1 == 3'b000) ? 8'h00 : registers[rs1];
     assign rd2 = (rs2 == 3'b000) ? 8'h00 : registers[rs2];
+    assign debug_x3 = registers[3];
 
 endmodule

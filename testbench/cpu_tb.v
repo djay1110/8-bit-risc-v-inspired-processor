@@ -7,6 +7,8 @@ module cpu_tb;
     reg loop_rst;
     wire arithmetic_illegal;
     wire loop_illegal;
+    wire [7:0] arithmetic_debug_x3;
+    wire [7:0] loop_debug_x3;
 
     integer errors;
     integer checks;
@@ -23,7 +25,8 @@ module cpu_tb;
     ) arithmetic_cpu (
         .clk(clk),
         .rst(arithmetic_rst),
-        .illegal_instr(arithmetic_illegal)
+        .illegal_instr(arithmetic_illegal),
+        .debug_x3(arithmetic_debug_x3)
     );
 
     cpu #(
@@ -31,7 +34,8 @@ module cpu_tb;
     ) loop_cpu (
         .clk(clk),
         .rst(loop_rst),
-        .illegal_instr(loop_illegal)
+        .illegal_instr(loop_illegal),
+        .debug_x3(loop_debug_x3)
     );
 
     always #5 clk = ~clk;
@@ -141,6 +145,8 @@ module cpu_tb;
         arithmetic_step(8'h03, "ADD advances PC");
         check_value(arithmetic_cpu.core.registers.registers[3] === 8'd15,
                     "arithmetic program x3 expected 15, actual value checked");
+        check_value(arithmetic_debug_x3 === 8'd15,
+                    "CPU debug output reports x3=15");
         report_group(starting_errors, "Arithmetic test");
 
         starting_errors = errors;
@@ -296,6 +302,8 @@ module cpu_tb;
             arithmetic_cpu.core.registers.registers[6],
             arithmetic_cpu.core.registers.registers[7]
         } === 56'h0), "post-execution reset clears x1-x7");
+        check_value(arithmetic_debug_x3 === 8'h00,
+                    "post-execution reset clears debug x3 output");
         check_value(arithmetic_cpu.data_ram.memory[0] === 8'hFF,
                     "post-execution reset preserves wrapped memory[0]");
         check_value(arithmetic_cpu.data_ram.memory[20] === 8'd15,
@@ -324,6 +332,8 @@ module cpu_tb;
                     "loop program expected x1=5");
         check_value(loop_cpu.core.registers.registers[3] === 8'd0,
                     "loop counter x3 reaches zero");
+        check_value(loop_debug_x3 === 8'd0,
+                    "loop CPU debug output tracks x3=0");
         check_value(taken_branch_count === 1,
                     "loop BEQ is taken once to DONE");
         check_value(backward_jump_count === 4,

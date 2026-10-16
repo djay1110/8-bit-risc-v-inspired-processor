@@ -11,6 +11,7 @@ module register_file_tb;
     reg [7:0] wd;
     wire [7:0] rd1;
     wire [7:0] rd2;
+    wire [7:0] debug_x3;
 
     integer errors;
     integer i;
@@ -24,7 +25,8 @@ module register_file_tb;
         .rd(rd),
         .wd(wd),
         .rd1(rd1),
-        .rd2(rd2)
+        .rd2(rd2),
+        .debug_x3(debug_x3)
     );
 
     always #5 clk = ~clk;
@@ -64,6 +66,7 @@ module register_file_tb;
         rs2 = 3'd0;
         check_value(rd1, 8'h00, "x0 read after reset (port 1)");
         check_value(rd2, 8'h00, "x0 read after reset (port 2)");
+        check_value(debug_x3, 8'h00, "debug x3 after reset");
 
         // Check all writable registers were reset to zero.
         rst = 1'b0;
@@ -106,6 +109,8 @@ module register_file_tb;
             rs1 = i[2:0];
             #1;
             check_value(rd1, 8'h40 + i, "written register x3-x7");
+            if (i == 3)
+                check_value(debug_x3, 8'h43, "debug x3 follows stored x3 value");
         end
 
         // Attempted x0 write must be discarded, and x0 must remain zero.
@@ -146,6 +151,7 @@ module register_file_tb;
         #1;
         check_value(rd1, 8'h00, "x1 after reset edge");
         check_value(rd2, 8'h00, "x2 after reset edge");
+        check_value(debug_x3, 8'h00, "debug x3 after reset edge");
         rs1 = 3'd0;
         rs2 = 3'd0;
         #1;

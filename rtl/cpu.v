@@ -6,7 +6,8 @@ module cpu #(
 ) (
     input  clk,
     input  rst,
-    output illegal_instr
+    output illegal_instr,
+    output [7:0] debug_x3
 );
 
     wire [7:0] pc;
@@ -32,7 +33,8 @@ module cpu #(
         .data_address(data_address),
         .data_write_data(data_write_data),
         .data_write_enable(data_write_enable),
-        .illegal_instr(illegal_instr)
+        .illegal_instr(illegal_instr),
+        .debug_x3(debug_x3)
     );
 
     data_memory data_ram (

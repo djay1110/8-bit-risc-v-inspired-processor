@@ -11,6 +11,7 @@ module datapath_tb;
     wire data_write_enable;
     wire [7:0] data_read_data;
     wire illegal_instr;
+    wire [7:0] debug_x3;
 
     reg [15:0] rom [0:255];
     integer errors;
@@ -28,7 +29,8 @@ module datapath_tb;
         .data_address(data_address),
         .data_write_data(data_write_data),
         .data_write_enable(data_write_enable),
-        .illegal_instr(illegal_instr)
+        .illegal_instr(illegal_instr),
+        .debug_x3(debug_x3)
     );
 
     data_memory data_mem (
@@ -175,6 +177,7 @@ module datapath_tb;
         check_register(3'd2, 8'd3, "ADDI writes x2=3");
         execute_and_check_pc(8'h03, "ADD advances PC to 3");
         check_register(3'd3, 8'd8, "ADD writes x3=8");
+        check_value(debug_x3 === 8'd8, "datapath exposes x3 through debug output");
         execute_and_check_pc(8'h04, "SUB advances PC to 4");
         check_register(3'd4, 8'd2, "SUB writes x4=2");
 

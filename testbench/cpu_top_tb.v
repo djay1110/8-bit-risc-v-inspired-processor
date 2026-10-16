@@ -5,6 +5,7 @@ module cpu_top_tb;
     reg clk;
     reg rst;
     wire illegal_instr;
+    wire [7:0] debug_x3;
     integer errors;
     integer checks;
 
@@ -13,7 +14,8 @@ module cpu_top_tb;
     ) dut (
         .clk(clk),
         .rst(rst),
-        .illegal_instr(illegal_instr)
+        .illegal_instr(illegal_instr),
+        .debug_x3(debug_x3)
     );
 
     always #5 clk = ~clk;
@@ -62,16 +64,19 @@ module cpu_top_tb;
         check_value(dut.core.registers.registers[2] === 8'd10, "x2 contains 10");
         execute_instruction(8'h03, "ADD advances the PC");
         check_value(dut.core.registers.registers[3] === 8'd15, "x3 contains 15");
+        check_value(debug_x3 === 8'd15, "CPU debug output exposes x3=15");
         execute_instruction(8'h04, "STORE advances the PC");
         check_value(dut.data_ram.memory[20] === 8'd15, "STORE writes 15 to memory[20]");
         execute_instruction(8'h05, "LOAD advances the PC");
         check_value(dut.core.registers.registers[4] === 8'd15, "LOAD writes 15 to x4");
 
         #1;
-        check_value(illegal_instr === 1'b1, "ROM illegal instruction is reported");
-        execute_instruction(8'h06, "illegal instruction advances PC normally");
+        check_value(illegal_instr === 1'b0, "ROM self-loop instruction is legal");
+        check_value(dut.core.pc_next === 8'h05, "JAL x0,-1 selects its own address");
+        execute_instruction(8'h05, "JAL x0,-1 keeps the CPU at address 5");
         check_value(dut.core.registers.registers[4] === 8'd15,
-                    "illegal instruction does not alter x4");
+                    "register state remains intact during the ROM self-loop");
+        check_value(debug_x3 === 8'd15, "x3 remains 15 while the CPU loops");
 
         rst = 1'b1;
         @(posedge clk);
@@ -79,6 +84,7 @@ module cpu_top_tb;
         check_value(dut.pc === 8'h00, "CPU reset returns PC to zero");
         check_value(dut.core.registers.registers[1] === 8'h00,
                     "CPU reset clears general-purpose registers");
+        check_value(debug_x3 === 8'h00, "CPU debug output reflects reset x3=0");
         check_value(dut.data_ram.memory[20] === 8'd15,
                     "CPU reset preserves data memory contents");
 

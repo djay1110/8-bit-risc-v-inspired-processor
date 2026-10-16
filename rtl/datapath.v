@@ -11,7 +11,8 @@ module datapath (
     output [7:0] data_address,
     output [7:0] data_write_data,
     output       data_write_enable,
-    output       illegal_instr
+    output       illegal_instr,
+    output [7:0] debug_x3
 );
 
     wire [3:0] opcode;
@@ -73,7 +74,8 @@ module datapath (
         .rd(rd),
         .wd(writeback_data),
         .rd1(rs1_data),
-        .rd2(rs2_data)
+        .rd2(rs2_data),
+        .debug_x3(debug_x3)
     );
 
     immediate_generator immediates (
